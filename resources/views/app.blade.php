@@ -4,18 +4,26 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <!-- SEO -->
+        <meta name="description" content="Sistem Pakar Diagnosis Dini Stunting — Posyandu Melati Pujer, Bondowoso">
+        <meta name="author" content="Muhammad Farhan Maulana — Politeknik Negeri Jember">
+
+        <!-- Inertia title -->
+        <title inertia>{{ config('app.name', 'SiPakar Stunting') }}</title>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        <!-- Scripts -->
+        <!-- Scripts + Styles (Vite) -->
         @routes
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased bg-gray-50">
         @inertia
     </body>
 </html>

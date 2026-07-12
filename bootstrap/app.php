@@ -10,17 +10,27 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+    ->withMiddleware(function (Middleware $middleware) {
+
+        // Daftarkan Inertia middleware di grup web
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
-          $middleware->alias([
+
+        // Daftarkan role middleware sebagai alias
+        $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
 
-        //
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function (Exceptions $exceptions) {
+        // Render error sebagai Inertia response
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, $request) {
+            if ($request->header('X-Inertia')) {
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Terjadi kesalahan.',
+                ], $e->getStatusCode());
+            }
+        });
     })->create();
