@@ -30,8 +30,10 @@ Route::middleware(['auth', 'role:kader,admin'])
         Route::get('/dashboard', [DashboardController::class, 'kader'])
              ->name('dashboard');
 
-        // Balita
-        Route::resource('balita', BalitaController::class);
+        Route::resource('balita', BalitaController::class)
+    ->parameters([
+        'balita' => 'balita'
+    ]);
 
         // Kunjungan (pencatatan posyandu)
         Route::resource('kunjungan', KunjunganController::class);

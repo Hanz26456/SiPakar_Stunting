@@ -67,10 +67,10 @@ class Balita extends Model
     }
 
     // Status stunting terbaru (dari diagnosis terakhir)
-    public function getStatusTerbaruAttribute(): ?string
-    {
-        return $this->diagnosisTerbaru?->status_final;
-    }
+   public function getStatusTerbaruAttribute(): ?string
+{
+    return $this->kunjunganTerbaru?->diagnosis?->status_final;
+}
 
     // ===== RELATIONSHIPS =====
 
@@ -101,6 +101,7 @@ class Balita extends Model
                     ->latestOfMany('tanggal_kunjungan');
     }
 
+
     public function diagnosis(): HasMany
     {
         return $this->hasManyThrough(
@@ -111,15 +112,6 @@ class Balita extends Model
         );
     }
 
-    public function diagnosisTerbaru(): HasOne
-    {
-        return $this->hasOneThrough(
-            Diagnosis::class,
-            Kunjungan::class,
-            'balita_id',
-            'kunjungan_id'
-        )->latestOfMany('diagnosis.created_at');
-    }
 
     // ===== SCOPES =====
 

@@ -101,9 +101,9 @@ class Diagnosis extends Model
 
     // Shortcut ke balita via kunjungan
     public function getBalitaAttribute()
-    {
-        return $this->kunjungan->balita;
-    }
+{
+    return $this->kunjungan?->balita;
+}
 
     // ===== SCOPES =====
 

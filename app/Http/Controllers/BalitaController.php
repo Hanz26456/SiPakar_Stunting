@@ -18,16 +18,16 @@ class BalitaController extends Controller
     public function index(Request $request): Response
     {
         $balita = Balita::aktif()
-            ->with(['kunjunganTerbaru', 'diagnosisTerbaru'])
+            ->with(['kunjunganTerbaru.diagnosis'])
             ->when($request->search, fn($q) =>
                 $q->where('nama', 'like', "%{$request->search}%")
                   ->orWhere('nama_ibu', 'like', "%{$request->search}%")
             )
             ->when($request->status, function ($q) use ($request) {
-                $q->whereHas('diagnosisTerbaru', fn($d) =>
-                    $d->where('status_stunting', $request->status)
-                );
-            })
+            $q->whereHas('kunjunganTerbaru.diagnosis', function ($d) use ($request) {
+                $d->where('status_stunting', $request->status);
+            });
+        })
             ->orderBy('nama')
             ->paginate(15)
             ->withQueryString();
