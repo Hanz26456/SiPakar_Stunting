@@ -20,7 +20,7 @@ Route::middleware('auth')->get('/', function () {
         'ortu'   => redirect()->route('ortu.dashboard'),
         default  => redirect()->route('login'),
     };
-});
+})->name('dashboard');
 
 // ===== KADER =====
 Route::middleware(['auth', 'role:kader,admin'])
