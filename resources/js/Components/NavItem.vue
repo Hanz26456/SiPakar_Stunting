@@ -1,15 +1,18 @@
 <template>
-  <Link
-    :href="href"
+  <Link 
+    :href="href" 
     :class="[
-      'flex items-center gap-3 px-2 py-2 rounded-lg text-sm transition-colors',
-      active
-        ? 'bg-emerald-50 text-emerald-700 font-medium'
-        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',
+      active 
+        ? 'bg-blue-50 text-blue-700 border border-blue-100' 
+        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
     ]"
   >
-    <span class="text-base flex-shrink-0 w-5 text-center">{{ icon }}</span>
-    <span v-if="open" class="truncate">{{ label }}</span>
+    <span :class="['flex-shrink-0', active ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600']">
+      <slot name="icon" />
+    </span>
+    <span v-if="open" class="truncate flex-1">{{ label }}</span>
+    <slot name="badge" />
   </Link>
 </template>
 
@@ -19,7 +22,6 @@ defineProps({
   href: String,
   active: Boolean,
   open: Boolean,
-  icon: String,
-  label: String,
+  label: String
 })
 </script>

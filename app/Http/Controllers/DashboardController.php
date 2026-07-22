@@ -194,101 +194,85 @@ class DashboardController extends Controller
         return Inertia::render('Ortu/Panduan');
     }
 
-    // ===== ADMIN =====
-    public function admin(): Response
-    {
-        $stats = $this->kunjunganService->statistikDashboard();
-
-        return Inertia::render('Admin/Dashboard', [
-            'stats' => array_merge($stats, [
-                'total_pengguna' => \App\Models\User::count(),
-                'total_rule'     => \App\Models\RuleCf::where('is_active', true)->count(),
-                'total_diagnosis'=> Diagnosis::count(),
-                'akurasi'        => $this->hitungAkurasi(),
-            ]),
-            'aktivitas_terbaru' => $this->aktivitasTerbaru(),
-            'distribusi'        => $this->grafikDistribusi(6),
+   Public function admin(): Response
+{
+    $stats = $this->kunjunganService->statistikDashboard();
+ 
+    // Jumlah pengguna per role
+    $jumlahPerRole = \App\Models\User::selectRaw('role, count(*) as total')
+        ->groupBy('role')
+        ->pluck('total', 'role');
+ 
+    // Akurasi sistem vs verifikasi bidan
+    $terverifikasi = \App\Models\Diagnosis::sudahVerifikasi()
+        ->whereNotNull('status_override')
+        ->get();
+ 
+    $akurasi = 0;
+    if ($terverifikasi->count() > 0) {
+        $sesuai  = $terverifikasi
+            ->filter(fn($d) => $d->status_stunting === $d->status_override)
+            ->count();
+        $akurasi = round($sesuai / $terverifikasi->count() * 100, 1);
+    }
+ 
+    // Aktivitas terbaru
+    $aktivitas = \App\Models\Diagnosis::with(['kunjungan.balita', 'kader'])
+        ->latest()
+        ->take(5)
+        ->get()
+        ->map(fn($d) => [
+            'label' => "Diagnosis {$d->kunjungan->balita->nama} — {$d->label_status}",
+            'user'  => $d->kader->name,
+            'waktu' => $d->created_at->diffForHumans(),
         ]);
-    }
-
-    public function log(): Response
-    {
-        // Bisa dikembangkan dengan package spatie/laravel-activitylog
-        return Inertia::render('Admin/Log');
-    }
-
-    public function pengaturan(): Response
-    {
-        return Inertia::render('Admin/Pengaturan');
-    }
-
-    // ===== PRIVATE HELPERS =====
-
-    /**
-     * Data grafik distribusi status stunting N bulan terakhir.
-     */
-    private function grafikDistribusi(int $bulan = 6): array
-    {
-        $hasil = [];
-        for ($i = $bulan - 1; $i >= 0; $i--) {
-            $tanggal = now()->subMonths($i);
-            $label   = $tanggal->format('M Y');
-
-            $kunjungan = Kunjungan::whereMonth('tanggal_kunjungan', $tanggal->month)
-                ->whereYear('tanggal_kunjungan', $tanggal->year)
-                ->with('diagnosis')
-                ->get();
-
-            $hasil[] = [
-                'bulan'          => $label,
-                'total'          => $kunjungan->count(),
-                'normal'         => $kunjungan->filter(fn($k) =>
-                    $k->diagnosis?->status_final === 'normal')->count(),
-                'berisiko'       => $kunjungan->filter(fn($k) =>
-                    $k->diagnosis?->status_final === 'berisiko')->count(),
-                'stunting'       => $kunjungan->filter(fn($k) =>
-                    in_array($k->diagnosis?->status_final, ['stunting', 'stunting_berat'])
-                )->count(),
-            ];
-        }
-        return $hasil;
-    }
-
-    /**
-     * Hitung akurasi sistem vs verifikasi bidan.
-     * CF akurat = status sistem sama dengan status setelah verifikasi bidan.
-     */
-    private function hitungAkurasi(): float
-    {
-        $terverifikasi = Diagnosis::sudahVerifikasi()
-            ->whereNotNull('status_override')
+ 
+    return Inertia::render('Admin/Dashboard', [
+        'stats' => array_merge($stats, [
+            'total_pengguna'  => \App\Models\User::count(),
+            'total_rule'      => \App\Models\RuleCf::where('is_active', true)->count(),
+            'total_gejala'    => \App\Models\Gejala::where('is_active', true)->count(),
+            'total_diagnosis' => \App\Models\Diagnosis::count(),
+            'akurasi'         => $akurasi,
+            'jumlah_admin'    => $jumlahPerRole['admin']  ?? 0,
+            'jumlah_bidan'    => $jumlahPerRole['bidan']  ?? 0,
+            'jumlah_kader'    => $jumlahPerRole['kader']  ?? 0,
+            'jumlah_ortu'     => $jumlahPerRole['ortu']   ?? 0,
+            'stunting_berat'  => \App\Models\Diagnosis::where('status_stunting', 'stunting_berat')->count(),
+        ]),
+        'aktivitas_terbaru' => $aktivitas,
+        'distribusi'        => $this->grafikDistribusi(6),
+    ]);
+}
+ 
+// ================================================================
+// TAMBAHKAN method grafikDistribusi() di dalam class
+// (kalau belum ada di DashboardController)
+// ================================================================
+ 
+private function grafikDistribusi(int $bulan = 6): array
+{
+    $hasil = [];
+    for ($i = $bulan - 1; $i >= 0; $i--) {
+        $tanggal   = now()->subMonths($i);
+        $kunjungan = \App\Models\Kunjungan::with('diagnosis')
+            ->whereMonth('tanggal_kunjungan', $tanggal->month)
+            ->whereYear('tanggal_kunjungan', $tanggal->year)
             ->get();
-
-        if ($terverifikasi->isEmpty()) return 0.0;
-
-        $sesuai = $terverifikasi->filter(
-            fn($d) => $d->status_stunting === $d->status_override
-        )->count();
-
-        return round($sesuai / $terverifikasi->count() * 100, 1);
+ 
+        $hasil[] = [
+            'bulan'    => $tanggal->format('M Y'),
+            'total'    => $kunjungan->count(),
+            'normal'   => $kunjungan->filter(fn($k) =>
+                $k->diagnosis?->status_final === 'normal')->count(),
+            'berisiko' => $kunjungan->filter(fn($k) =>
+                $k->diagnosis?->status_final === 'berisiko')->count(),
+            'stunting' => $kunjungan->filter(fn($k) =>
+                in_array($k->diagnosis?->status_final, ['stunting', 'stunting_berat'])
+            )->count(),
+        ];
     }
+    return $hasil;
+}
 
-    /**
-     * Aktivitas terbaru untuk dashboard admin.
-     */
-    private function aktivitasTerbaru(): array
-    {
-        $diagnosis = Diagnosis::with(['kunjungan.balita', 'kader'])
-            ->latest()
-            ->take(5)
-            ->get()
-            ->map(fn($d) => [
-                'tipe'    => 'diagnosis',
-                'label'   => "Diagnosis {$d->kunjungan->balita->nama} — {$d->label_status}",
-                'user'    => $d->kader->name,
-                'waktu'   => $d->created_at->diffForHumans(),
-            ]);
-
-        return $diagnosis->toArray();
-    }
 }

@@ -1,93 +1,193 @@
 <template>
-  <div class="flex h-screen bg-gray-50 overflow-hidden">
-
+  <div class="flex h-screen bg-slate-50 overflow-hidden font-sans antialiased">
+    
     <!-- Sidebar -->
     <aside
       :class="[
-        'flex flex-col bg-white border-r border-gray-200 transition-all duration-300 z-30',
-        sidebarOpen ? 'w-56' : 'w-16'
+        'flex flex-col bg-slate-50 border-r border-slate-200 transition-all duration-300 ease-in-out z-30 relative',
+        sidebarOpen ? 'w-60' : 'w-[4.5rem]'
       ]"
     >
-      <div class="flex items-center gap-3 px-4 py-4 border-b border-gray-100">
-        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
-          <span class="text-white text-xs font-bold">SP</span>
+      <!-- Logo Area -->
+      <div class="flex items-center gap-3 px-4 h-16 border-b border-slate-200 flex-shrink-0">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-200">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
         </div>
-        <div v-if="sidebarOpen" class="overflow-hidden">
-          <div class="text-sm font-semibold text-gray-800 whitespace-nowrap">SiPakar Stunting</div>
-          <div class="text-xs text-gray-400 whitespace-nowrap">Posyandu Melati Pujer</div>
+        <div v-if="sidebarOpen" class="overflow-hidden transition-opacity duration-200">
+          <div class="text-sm font-semibold text-slate-800 tracking-tight">SiPakar Stunting</div>
+          <div class="text-xs text-slate-500 mt-0.5">Posyandu Melati Pujer</div>
         </div>
+        
+        <!-- Toggle Button (integrated in header) -->
+        <button
+          v-if="sidebarOpen"
+          @click="sidebarOpen = false"
+          class="ml-auto p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+          title="Tutup sidebar"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+          </svg>
+        </button>
       </div>
 
-      <div v-if="sidebarOpen" class="mx-3 mt-3 mb-1">
-        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
-          <span>👩‍⚕️</span> Tenaga Kesehatan
+      <!-- Role Badge -->
+      <div v-if="sidebarOpen" class="px-4 pt-4 pb-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium border border-blue-100">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          Tenaga Kesehatan
         </span>
       </div>
 
-      <nav class="flex-1 px-2 py-2 space-y-1">
-        <NavItem :href="route('bidan.dashboard')" :active="isActive('bidan.dashboard')" :open="sidebarOpen" icon="🏠" label="Dashboard" />
-        <NavItem :href="route('bidan.monitoring')" :active="isActive('bidan.monitoring')" :open="sidebarOpen" icon="📡" label="Monitoring" />
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+        <NavItem 
+          :href="route('bidan.dashboard')" 
+          :active="isActive('bidan.dashboard')" 
+          :open="sidebarOpen" 
+          label="Dashboard"
+        >
+          <template #icon>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+            </svg>
+          </template>
+        </NavItem>
 
-        <div class="pt-2 pb-1">
-          <div v-if="sidebarOpen" class="px-2 text-xs text-gray-400 uppercase tracking-wider">Tindakan</div>
-          <div v-else class="border-t border-gray-100 mx-1 my-1"></div>
+        <NavItem 
+          :href="route('bidan.monitoring')" 
+          :active="isActive('bidan.monitoring')" 
+          :open="sidebarOpen" 
+          label="Monitoring"
+        >
+          <template #icon>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </template>
+        </NavItem>
+
+        <!-- Divider -->
+        <div class="pt-3 pb-1">
+          <div v-if="sidebarOpen" class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Tindakan</div>
+          <div v-else class="border-t border-slate-200 mx-2 my-2"></div>
         </div>
 
-        <NavItem :href="route('bidan.monitoring')" :active="false" :open="sidebarOpen" icon="✅" label="Verifikasi">
+        <NavItem 
+          :href="route('bidan.monitoring')" 
+          :active="false" 
+          :open="sidebarOpen" 
+          label="Verifikasi"
+        >
+          <template #icon>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </template>
           <template #badge>
-            <span v-if="pendingCount > 0" class="ml-auto bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-5 text-center">
+            <span v-if="pendingCount > 0" class="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[1.25rem] text-center leading-none">
               {{ pendingCount }}
             </span>
           </template>
         </NavItem>
-        <NavItem :href="route('bidan.laporan')" :active="isActive('bidan.laporan')" :open="sidebarOpen" icon="📊" label="Laporan" />
+
+        <NavItem 
+          :href="route('bidan.laporan')" 
+          :active="isActive('bidan.laporan')" 
+          :open="sidebarOpen" 
+          label="Laporan"
+        >
+          <template #icon>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </template>
+        </NavItem>
       </nav>
 
-      <div class="border-t border-gray-100 p-2">
+      <!-- Bottom Area -->
+      <div class="border-t border-slate-200 p-3 flex-shrink-0">
+        <!-- Expand Button (when collapsed) -->
         <button
-          @click="sidebarOpen = !sidebarOpen"
-          class="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors"
+          v-if="!sidebarOpen"
+          @click="sidebarOpen = true"
+          class="w-full flex items-center justify-center p-2 rounded-lg text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
+          title="Buka sidebar"
         >
-          <span class="text-base">{{ sidebarOpen ? '◀' : '▶' }}</span>
-          <span v-if="sidebarOpen" class="text-xs">Sembunyikan</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+          </svg>
         </button>
-        <div v-if="sidebarOpen" class="flex items-center gap-2 px-2 py-2 mt-1">
-          <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold flex-shrink-0">
+
+        <!-- User Profile -->
+        <div v-if="sidebarOpen" class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-100 transition-colors group">
+          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold flex-shrink-0 border border-blue-200">
             {{ initials }}
           </div>
-          <div class="overflow-hidden flex-1">
-            <div class="text-xs font-medium text-gray-700 truncate">{{ $page.props.auth.user.name }}</div>
-            <Link :href="route('logout')" method="post" as="button" class="text-xs text-gray-400 hover:text-red-500">Keluar</Link>
+          <div class="overflow-hidden flex-1 min-w-0">
+            <div class="text-xs font-medium text-slate-700 truncate">{{ $page.props.auth.user.name }}</div>
+            <Link :href="route('logout')" method="post" as="button" class="text-[11px] text-slate-400 hover:text-red-500 transition-colors">
+              Keluar
+            </Link>
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- Main -->
-    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
-      <header class="bg-white border-b border-gray-200 px-5 h-13 flex items-center justify-between flex-shrink-0">
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden min-w-0 bg-white">
+      <!-- Header -->
+      <header class="bg-white border-b border-slate-200 px-6 h-14 flex items-center justify-between flex-shrink-0 shadow-sm shadow-slate-100/50">
         <div class="flex items-center gap-3">
-          <h1 class="text-base font-semibold text-gray-800">{{ title }}</h1>
+          <h1 class="text-base font-semibold text-slate-800 tracking-tight">{{ title }}</h1>
           <slot name="topbar-extra" />
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full">
-            📍 Puskesmas Pujer
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center gap-1.5 text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full border border-slate-200">
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Puskesmas Pujer
           </span>
-          <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold">
+          <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-700 text-xs font-bold border border-blue-100">
             {{ initials }}
           </div>
         </div>
       </header>
 
-      <div v-if="$page.props.flash?.success" class="mx-5 mt-4">
-        <div class="bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-3 rounded-lg flex items-center justify-between">
-          <span>✅ {{ $page.props.flash.success }}</span>
-          <button @click="$page.props.flash.success = null" class="text-blue-400 hover:text-blue-600">✕</button>
+      <!-- Flash Message -->
+      <Transition 
+        enter-active-class="transition ease-out duration-200" 
+        enter-from-class="opacity-0 -translate-y-2" 
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition ease-in duration-150" 
+        leave-from-class="opacity-100 translate-y-0" 
+        leave-to-class="opacity-0 -translate-y-2"
+      >
+        <div v-if="$page.props.flash?.success" class="mx-6 mt-4">
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-lg flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              <span>{{ $page.props.flash.success }}</span>
+            </div>
+            <button @click="$page.props.flash.success = null" class="text-emerald-400 hover:text-emerald-600 transition-colors p-0.5 rounded hover:bg-emerald-100">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
+      </Transition>
 
-      <main class="flex-1 overflow-auto p-5">
+      <!-- Main -->
+      <main class="flex-1 overflow-auto p-6">
         <slot />
       </main>
     </div>
@@ -99,12 +199,19 @@ import { ref, computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import NavItem from '@/Components/NavItem.vue'
 
-defineProps({ title: String, pendingCount: { type: Number, default: 0 } })
+defineProps({ 
+  title: String, 
+  pendingCount: { type: Number, default: 0 } 
+})
+
 const page = usePage()
 const sidebarOpen = ref(true)
+
 const initials = computed(() => {
   const name = page.props.auth?.user?.name ?? ''
+  if (!name) return '?'
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 })
+
 const isActive = (r) => route().current(r + '*')
 </script>
