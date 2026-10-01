@@ -1,3 +1,252 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── Orbit Runtime CSS Variables ─────────────────────────────────────────── */
+:root {
+  /* Dark mode (default) */
+  --bg:       #09090E;
+  --surface:  #0F0F17;
+  --surface2: #14141E;
+  --surface3: #1A1A26;
+  --border:   #1E1E2E;
+  --border2:  #262636;
+
+  --text-primary:   #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted:     #94A3B8;
+  --text-subtle:    #64748B;
+
+  --hover-bg:     rgba(255, 255, 255, 0.05);
+  --hover-bg2:    rgba(255, 255, 255, 0.08);
+  --hover-bg3:    rgba(255, 255, 255, 0.02);
+  --glass-bg:     rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.07);
+}
+
+html:not(.dark) {
+  /* Light mode overrides */
+  --bg:       #F8FAFC;
+  --surface:  #FFFFFF;
+  --surface2: #F1F5F9;
+  --surface3: #E8EDF3;
+  --border:   #E2E8F0;
+  --border2:  #CBD5E1;
+
+  --text-primary:   #0F172A;
+  --text-secondary: #1E293B;
+  --text-muted:     #475569;
+  --text-subtle:    #94A3B8;
+
+  --hover-bg:     rgba(0, 0, 0, 0.04);
+  --hover-bg2:    rgba(0, 0, 0, 0.07);
+  --hover-bg3:    rgba(0, 0, 0, 0.02);
+  --glass-bg:     rgba(0, 0, 0, 0.02);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Global resets & smooth transitions ──────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ─── Light mode text color overrides (Crucial from Orbit 1.0.0) ─────────── */
+html:not(.dark) .text-slate-100,
+html:not(.dark) .text-slate-200 { color: var(--text-primary) !important; }
+html:not(.dark) .text-slate-300  { color: var(--text-secondary) !important; }
+html:not(.dark) .text-slate-400,
+html:not(.dark) .text-slate-500  { color: var(--text-muted) !important; }
+html:not(.dark) .text-slate-600,
+html:not(.dark) .text-slate-700  { color: var(--text-subtle) !important; }
+
+/* Placeholder colors in light mode */
+html:not(.dark) ::placeholder { color: var(--text-subtle) !important; opacity: 1; }
+
+/* Light mode hover overrides */
+html:not(.dark) .hover\:bg-white\/5:hover  { background-color: rgba(0, 0, 0, 0.05) !important; }
+html:not(.dark) .hover\:bg-white\/3:hover  { background-color: rgba(0, 0, 0, 0.03) !important; }
+html:not(.dark) .hover\:bg-white\/8:hover  { background-color: rgba(0, 0, 0, 0.06) !important; }
+html:not(.dark) .hover\:bg-white\/10:hover { background-color: rgba(0, 0, 0, 0.07) !important; }
+html:not(.dark) .bg-white\/5  { background-color: rgba(0, 0, 0, 0.04) !important; }
+html:not(.dark) .bg-white\/3  { background-color: rgba(0, 0, 0, 0.02) !important; }
+html:not(.dark) .bg-white\/10 { background-color: rgba(0, 0, 0, 0.06) !important; }
+
+/* Sidebar border in light mode */
+html:not(.dark) .border-orbit-border { border-color: var(--border) !important; }
+
+/* Nav active indicator in light mode */
+html:not(.dark) .bg-orbit-primary\/15 { background-color: rgba(124, 58, 237, 0.12) !important; }
+html:not(.dark) .bg-orbit-primary\/10 { background-color: rgba(124, 58, 237, 0.08) !important; }
+
+/* ─── Smart Dark Mode Bridge for Legacy/Existing Pages ────────────────────── */
+html.dark .bg-white {
+  background-color: var(--surface) !important;
+  color: var(--text-primary);
+}
+html.dark .bg-gray-50,
+html.dark .bg-slate-50 {
+  background-color: var(--surface2) !important;
+}
+html.dark .bg-gray-100,
+html.dark .bg-slate-100 {
+  background-color: var(--surface3) !important;
+}
+
+html.dark .border-gray-100,
+html.dark .border-gray-200,
+html.dark .border-gray-300,
+html.dark .border-slate-100,
+html.dark .border-slate-200 {
+  border-color: var(--border) !important;
+}
+html.dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border) !important;
+}
+
+/* Dark mode text adaptation for gray utilities */
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700,
+html.dark .text-slate-800,
+html.dark .text-slate-900 {
+  color: var(--text-primary) !important;
+}
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-slate-600 {
+  color: var(--text-secondary) !important;
+}
+html.dark .text-gray-400 {
+  color: var(--text-muted) !important;
+}
+html.dark .text-gray-300 {
+  color: var(--text-subtle) !important;
+}
+
+/* Hover background for tables and lists in dark mode */
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover,
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Inputs, Selects, and Textareas in dark mode */
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+html.dark select,
+html.dark textarea {
+  background-color: var(--surface2) !important;
+  border-color: var(--border) !important;
+  color: var(--text-primary) !important;
+}
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25) !important;
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: var(--text-subtle) !important;
+}
+
+/* Tables in dark mode */
+html.dark table thead th {
+  color: var(--text-muted) !important;
+  border-color: var(--border) !important;
+}
+html.dark table tbody td {
+  border-color: var(--border) !important;
+  color: var(--text-secondary);
+}
+
+/* Modals & dropdowns */
+html.dark .shadow-sm,
+html.dark .shadow-md,
+html.dark .shadow-lg,
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ─── Scrollbars ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border2);
+  filter: brightness(1.2);
+}
+
+/* ─── Orbit Visual Effects ────────────────────────────────────────────────── */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
+}
+.glow-accent {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.5), rgba(6, 182, 212, 0.5));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.orbit-glow-bg {
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.3s ease;
+}
+html:not(.dark) .orbit-glow-bg {
+  opacity: 0.4;
+}

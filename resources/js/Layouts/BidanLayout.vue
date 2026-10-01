@@ -1,50 +1,56 @@
 <template>
-  <div class="flex h-screen bg-slate-50 overflow-hidden font-sans antialiased">
-    
+  <div class="flex h-screen bg-orbit-bg overflow-hidden font-sans antialiased relative selection:bg-purple-500 selection:text-white">
+    <!-- Ambient Orbit Glow -->
+    <div class="orbit-glow-bg" />
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <Transition
+      enter-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="mobileOpen"
+        @click="mobileOpen = false"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+      />
+    </Transition>
+
     <!-- Sidebar -->
     <aside
       :class="[
-        'flex flex-col bg-slate-50 border-r border-slate-200 transition-all duration-300 ease-in-out z-30 relative',
-        sidebarOpen ? 'w-60' : 'w-[4.5rem]'
+        'flex flex-col bg-orbit-surface/95 backdrop-blur-2xl border-r border-orbit-border transition-all duration-300 ease-in-out z-40 relative flex-shrink-0',
+        sidebarOpen ? 'w-64' : 'w-[4.5rem]',
+        mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 fixed lg:relative h-full'
       ]"
     >
       <!-- Logo Area -->
-      <div class="flex items-center gap-3 px-4 h-16 border-b border-slate-200 flex-shrink-0">
-        <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-200">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div v-if="sidebarOpen" class="overflow-hidden transition-opacity duration-200">
-          <div class="text-sm font-semibold text-slate-800 tracking-tight">SiPakar Stunting</div>
-          <div class="text-xs text-slate-500 mt-0.5">Posyandu Melati Pujer</div>
-        </div>
-        
-        <!-- Toggle Button (integrated in header) -->
+      <div class="flex items-center justify-between px-4 h-16 border-b border-orbit-border flex-shrink-0">
+        <OrbitLogo :collapsed="!sidebarOpen" subtitle="Tenaga Medis / Bidan" />
+
         <button
           v-if="sidebarOpen"
-          @click="sidebarOpen = false"
-          class="ml-auto p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
-          title="Tutup sidebar"
+          @click="toggleSidebar"
+          type="button"
+          class="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors focus:outline-none"
+          title="Tutup / Lipat sidebar"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-          </svg>
+          <PanelLeftClose class="w-4 h-4" />
         </button>
       </div>
 
       <!-- Role Badge -->
-      <div v-if="sidebarOpen" class="px-4 pt-4 pb-2">
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium border border-blue-100">
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </svg>
+      <div v-if="sidebarOpen" class="px-4 pt-3 pb-1">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-orbit-surface2 text-slate-300 text-[11px] font-medium border border-orbit-border">
           Tenaga Kesehatan
         </span>
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+      <nav class="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
         <NavItem 
           :href="route('bidan.dashboard')" 
           :active="isActive('bidan.dashboard')" 
@@ -52,9 +58,7 @@
           label="Dashboard"
         >
           <template #icon>
-            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-            </svg>
+            <LayoutDashboard class="w-4.5 h-4.5" />
           </template>
         </NavItem>
 
@@ -62,34 +66,32 @@
           :href="route('bidan.monitoring')" 
           :active="isActive('bidan.monitoring')" 
           :open="sidebarOpen" 
-          label="Monitoring"
+          label="Monitoring Pasien"
         >
           <template #icon>
-            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
+            <Activity class="w-4.5 h-4.5" />
           </template>
         </NavItem>
 
         <!-- Divider -->
-        <div class="pt-3 pb-1">
-          <div v-if="sidebarOpen" class="px-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Tindakan</div>
-          <div v-else class="border-t border-slate-200 mx-2 my-2"></div>
+        <div class="pt-4 pb-1">
+          <div v-if="sidebarOpen" class="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            Tindakan Medis
+          </div>
+          <div v-else class="border-t border-orbit-border mx-2 my-2" />
         </div>
 
         <NavItem 
           :href="route('bidan.monitoring')" 
           :active="false" 
           :open="sidebarOpen" 
-          label="Verifikasi"
+          label="Verifikasi Diagnosis"
         >
           <template #icon>
-            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+            <CheckSquare class="w-4.5 h-4.5" />
           </template>
           <template #badge>
-            <span v-if="pendingCount > 0" class="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[1.25rem] text-center leading-none">
+            <span v-if="pendingCount > 0" class="ml-auto bg-rose-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[1.25rem] text-center shadow-sm shadow-rose-500/30">
               {{ pendingCount }}
             </span>
           </template>
@@ -99,68 +101,49 @@
           :href="route('bidan.laporan')" 
           :active="isActive('bidan.laporan')" 
           :open="sidebarOpen" 
-          label="Laporan"
+          label="Laporan & Rekap"
         >
           <template #icon>
-            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
+            <FileSpreadsheet class="w-4.5 h-4.5" />
           </template>
         </NavItem>
       </nav>
 
-      <!-- Bottom Area -->
-      <div class="border-t border-slate-200 p-3 flex-shrink-0">
-        <!-- Expand Button (when collapsed) -->
+      <!-- Bottom User Section -->
+      <div class="border-t border-orbit-border p-3 flex-shrink-0 bg-orbit-surface2/30">
         <button
           v-if="!sidebarOpen"
           @click="sidebarOpen = true"
-          class="w-full flex items-center justify-center p-2 rounded-lg text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
+          type="button"
+          class="w-full flex items-center justify-center p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
           title="Buka sidebar"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-          </svg>
+          <PanelLeftOpen class="w-4.5 h-4.5" />
         </button>
 
-        <!-- User Profile -->
-        <div v-if="sidebarOpen" class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-100 transition-colors group">
-          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold flex-shrink-0 border border-blue-200">
+        <div v-if="sidebarOpen" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-white/5 transition-colors group">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm shadow-cyan-500/30">
             {{ initials }}
           </div>
           <div class="overflow-hidden flex-1 min-w-0">
-            <div class="text-xs font-medium text-slate-700 truncate">{{ $page.props.auth.user.name }}</div>
-            <Link :href="route('logout')" method="post" as="button" class="text-[11px] text-slate-400 hover:text-red-500 transition-colors">
-              Keluar
+            <div class="text-xs font-semibold text-slate-200 truncate group-hover:text-white">{{ $page.props.auth.user.name }}</div>
+            <Link :href="route('logout')" method="post" as="button" class="text-[11px] text-slate-500 hover:text-red-400 transition-colors flex items-center gap-1 mt-0.5">
+              <span>Keluar</span>
             </Link>
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden min-w-0 bg-white">
-      <!-- Header -->
-      <header class="bg-white border-b border-slate-200 px-6 h-14 flex items-center justify-between flex-shrink-0 shadow-sm shadow-slate-100/50">
-        <div class="flex items-center gap-3">
-          <h1 class="text-base font-semibold text-slate-800 tracking-tight">{{ title }}</h1>
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-hidden min-w-0 relative z-10">
+      <OrbitTopbar :title="title" role-label="Bidan" @toggle-sidebar="handleToggle">
+        <template #extra>
           <slot name="topbar-extra" />
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="inline-flex items-center gap-1.5 text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full border border-slate-200">
-            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            Puskesmas Pujer
-          </span>
-          <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-700 text-xs font-bold border border-blue-100">
-            {{ initials }}
-          </div>
-        </div>
-      </header>
+        </template>
+      </OrbitTopbar>
 
-      <!-- Flash Message -->
+      <!-- Flash Messages -->
       <Transition 
         enter-active-class="transition ease-out duration-200" 
         enter-from-class="opacity-0 -translate-y-2" 
@@ -169,25 +152,20 @@
         leave-from-class="opacity-100 translate-y-0" 
         leave-to-class="opacity-0 -translate-y-2"
       >
-        <div v-if="$page.props.flash?.success" class="mx-6 mt-4">
-          <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3 rounded-lg flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
+        <div v-if="$page.props.flash?.success" class="mx-4 sm:mx-6 lg:mx-8 mt-4">
+          <div class="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-sm px-4 py-3 rounded-2xl flex items-center justify-between shadow-lg shadow-emerald-500/5">
+            <div class="flex items-center gap-2.5">
+              <CheckCircle2 class="w-5 h-5 text-emerald-400 flex-shrink-0" />
               <span>{{ $page.props.flash.success }}</span>
             </div>
-            <button @click="$page.props.flash.success = null" class="text-emerald-400 hover:text-emerald-600 transition-colors p-0.5 rounded hover:bg-emerald-100">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
+            <button @click="$page.props.flash.success = null" class="text-emerald-400 hover:text-emerald-200 transition-colors p-1 rounded-lg hover:bg-emerald-500/20">
+              <X class="w-4 h-4" />
             </button>
           </div>
         </div>
       </Transition>
 
-      <!-- Main -->
-      <main class="flex-1 overflow-auto p-6">
+      <main class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
         <slot />
       </main>
     </div>
@@ -197,7 +175,20 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
+import {
+  LayoutDashboard,
+  Activity,
+  CheckSquare,
+  FileSpreadsheet,
+  Stethoscope,
+  PanelLeftClose,
+  PanelLeftOpen,
+  CheckCircle2,
+  X
+} from 'lucide-vue-next'
 import NavItem from '@/Components/NavItem.vue'
+import OrbitLogo from '@/Components/OrbitLogo.vue'
+import OrbitTopbar from '@/Components/OrbitTopbar.vue'
 
 defineProps({ 
   title: String, 
@@ -206,6 +197,19 @@ defineProps({
 
 const page = usePage()
 const sidebarOpen = ref(true)
+const mobileOpen = ref(false)
+
+const handleToggle = () => {
+  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    mobileOpen.value = !mobileOpen.value
+  } else {
+    sidebarOpen.value = !sidebarOpen.value
+  }
+}
+
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
+}
 
 const initials = computed(() => {
   const name = page.props.auth?.user?.name ?? ''

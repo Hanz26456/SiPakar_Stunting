@@ -1,198 +1,88 @@
 <script setup>
-import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import OrbitLogo from '@/Components/OrbitLogo.vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { Sun, Moon, LogOut, User } from 'lucide-vue-next';
+import { useTheme } from '@/Composables/useTheme';
 
-const showingNavigationDropdown = ref(false);
+const { theme, toggleTheme } = useTheme();
+const page = usePage();
+
+const initials = computed(() => {
+  const name = page.props.auth?.user?.name ?? '';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+});
 </script>
 
 <template>
-    <div>
-        <div class="min-h-screen bg-gray-100">
-            <nav
-                class="border-b border-gray-100 bg-white"
+  <div class="min-h-screen bg-orbit-bg relative font-sans antialiased selection:bg-purple-500 selection:text-white">
+    <!-- Ambient Orbit Glow -->
+    <div class="orbit-glow-bg" />
+
+    <!-- Top Navigation Menu -->
+    <header class="border-b border-orbit-border bg-orbit-surface/85 backdrop-blur-xl sticky top-0 z-30">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 justify-between items-center">
+          <div class="flex items-center gap-6">
+            <Link :href="route('dashboard')" class="focus:outline-none">
+              <OrbitLogo :collapsed="false" subtitle="Pengaturan Profil" />
+            </Link>
+
+            <Link
+              :href="route('dashboard')"
+              class="hidden sm:inline-flex text-xs font-semibold px-3 py-1.5 rounded-xl border border-orbit-border bg-orbit-surface2 hover:bg-white/5 text-slate-300 hover:text-white transition-colors"
             >
-                <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="flex h-16 justify-between">
-                        <div class="flex">
-                            <!-- Logo -->
-                            <div class="flex shrink-0 items-center">
-                                <Link :href="route('dashboard')">
-                                    <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800"
-                                    />
-                                </Link>
-                            </div>
+              ← Kembali ke Dashboard
+            </Link>
+          </div>
 
-                            <!-- Navigation Links -->
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                            <!-- Settings Dropdown -->
-                            <div class="relative ms-3">
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <span class="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {{ $page.props.auth.user.name }}
-
-                                                <svg
-                                                    class="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fill-rule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clip-rule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </template>
-
-                                    <template #content>
-                                        <DropdownLink
-                                            :href="route('profile.edit')"
-                                        >
-                                            Profile
-                                        </DropdownLink>
-                                        <DropdownLink
-                                            :href="route('logout')"
-                                            method="post"
-                                            as="button"
-                                        >
-                                            Log Out
-                                        </DropdownLink>
-                                    </template>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <!-- Hamburger -->
-                        <div class="-me-2 flex items-center sm:hidden">
-                            <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
-                                class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="sm:hidden"
-                >
-                    <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
-                    <div
-                        class="border-t border-gray-200 pb-1 pt-4"
-                    >
-                        <div class="px-4">
-                            <div
-                                class="text-base font-medium text-gray-800"
-                            >
-                                {{ $page.props.auth.user.name }}
-                            </div>
-                            <div class="text-sm font-medium text-gray-500">
-                                {{ $page.props.auth.user.email }}
-                            </div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Page Heading -->
-            <header
-                class="bg-white shadow"
-                v-if="$slots.header"
+          <div class="flex items-center gap-3">
+            <!-- Theme Toggle -->
+            <button
+              @click="toggleTheme"
+              type="button"
+              class="p-2 rounded-xl border border-orbit-border bg-orbit-surface hover:bg-white/5 text-slate-300 hover:text-white transition-colors focus:outline-none"
+              :title="theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'"
             >
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
-                </div>
-            </header>
+              <Sun v-if="theme === 'dark'" class="w-4.5 h-4.5 text-amber-400" />
+              <Moon v-else class="w-4.5 h-4.5 text-purple-400" />
+            </button>
 
-            <!-- Page Content -->
-            <main>
-                <slot />
-            </main>
+            <!-- User Badge -->
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-orbit-border bg-orbit-surface">
+              <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-600 flex items-center justify-center text-white text-xs font-bold">
+                {{ initials }}
+              </div>
+              <span class="text-xs font-semibold text-slate-200 hidden sm:inline">
+                {{ $page.props.auth.user.name }}
+              </span>
+            </div>
+
+            <!-- Logout -->
+            <Link
+              :href="route('logout')"
+              method="post"
+              as="button"
+              class="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              title="Keluar"
+            >
+              <LogOut class="w-4.5 h-4.5" />
+            </Link>
+          </div>
         </div>
-    </div>
+      </div>
+    </header>
+
+    <!-- Page Heading -->
+    <header class="border-b border-orbit-border/50 bg-orbit-surface/30 relative z-10" v-if="$slots.header">
+      <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <slot name="header" />
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="relative z-10">
+      <slot />
+    </main>
+  </div>
 </template>

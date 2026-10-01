@@ -18,12 +18,24 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+        <!-- Orbit Theme Init (instant dark/light mode, no flash) -->
+        <script>
+            (function() {
+                const theme = localStorage.getItem('orbit-theme') || 'dark';
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            })();
+        </script>
+
         <!-- Scripts + Styles (Vite) -->
         @routes
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
     </head>
-    <body class="font-sans antialiased bg-gray-50">
+    <body class="font-sans antialiased bg-orbit-bg min-h-screen transition-colors duration-200">
         @inertia
     </body>
 </html>

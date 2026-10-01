@@ -1,6 +1,7 @@
 <template>
-  <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', colorClass]">
-    {{ label }}
+  <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors', colorClass]">
+    <span class="w-1.5 h-1.5 rounded-full mr-1.5 flex-shrink-0" :class="dotClass" />
+    <span>{{ label }}</span>
   </span>
 </template>
 
@@ -8,14 +9,21 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  status: String,  // 'normal' | 'berisiko' | 'stunting' | 'stunting_berat'
+  status: String,
   label: String,
 })
 
 const colorClass = computed(() => ({
-  normal:         'bg-green-100 text-green-800',
-  berisiko:       'bg-amber-100 text-amber-800',
-  stunting:       'bg-red-100 text-red-800',
-  stunting_berat: 'bg-red-200 text-red-900',
-}[props.status] ?? 'bg-gray-100 text-gray-600'))
+  normal:         'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
+  berisiko:       'bg-amber-500/10 text-amber-400 border-amber-500/25',
+  stunting:       'bg-rose-500/10 text-rose-400 border-rose-500/25',
+  stunting_berat: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+}[props.status] ?? 'bg-slate-500/10 text-slate-300 border-slate-500/20'))
+
+const dotClass = computed(() => ({
+  normal:         'bg-emerald-400',
+  berisiko:       'bg-amber-400',
+  stunting:       'bg-rose-400',
+  stunting_berat: 'bg-rose-500',
+}[props.status] ?? 'bg-slate-400'))
 </script>
