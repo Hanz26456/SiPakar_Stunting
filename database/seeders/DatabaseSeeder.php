@@ -39,6 +39,15 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'name'       => 'Siti Aminah (Ibu Balita)',
+                'email'      => 'ortu@posyandu.id',
+                'password'   => Hash::make('password'),
+                'role'       => 'ortu',
+                'is_active'  => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         // ===== GEJALA =====

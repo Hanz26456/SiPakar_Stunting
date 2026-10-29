@@ -9,6 +9,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GejalaController;
 use App\Http\Controllers\Admin\RuleCfController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // ===== REDIRECT BERDASARKAN ROLE SETELAH LOGIN =====
@@ -96,6 +97,8 @@ Route::middleware(['auth', 'role:ortu'])
     ->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'ortu'])
              ->name('dashboard');
+        Route::get('/pertumbuhan', [DashboardController::class, 'pertumbuhanAnak'])
+             ->name('anak');
         Route::get('/anak/{balita}',
             [DashboardController::class, 'detailAnak'])
             ->name('anak.show');
@@ -130,5 +133,12 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/pengaturan', [DashboardController::class, 'pengaturan'])
              ->name('pengaturan');
     });
+
+// ===== PROFIL PENGGUNA =====
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
 require __DIR__.'/auth.php';

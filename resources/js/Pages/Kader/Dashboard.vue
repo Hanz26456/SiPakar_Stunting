@@ -1,12 +1,12 @@
 <template>
   <KaderLayout title="Dashboard Kader Posyandu">
     <!-- Header -->
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-100">
+        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
           Pencatatan & Diagnosis Dini
         </h2>
-        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
           Catat antropometri kunjungan bulanan balita dan lakukan diagnosis stunting dengan metode Certainty Factor.
         </p>
       </div>
@@ -14,10 +14,44 @@
       <div class="flex items-center gap-2">
         <Link
           :href="route('kader.kunjungan.create')"
-          class="inline-flex items-center px-3.5 py-2.5 rounded-xl bg-orbit-primary hover:bg-orbit-primary-light text-xs font-semibold text-white shadow-sm transition-all"
+          class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-orbit-primary hover:bg-orbit-primary/90 text-xs font-semibold text-white shadow-md shadow-purple-600/20 transition-all"
         >
-          + Input Kunjungan Baru
+          <Plus class="w-3.5 h-3.5" />
+          <span>Input Kunjungan Baru</span>
         </Link>
+      </div>
+    </div>
+
+    <!-- 5 Meja Posyandu Guided Workflow Banner -->
+    <div class="bg-gradient-to-r from-purple-500/10 via-indigo-500/5 to-cyan-500/10 border border-purple-500/20 dark:border-purple-500/30 rounded-2xl p-5 mb-6 backdrop-blur-sm">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-300 text-[11px] font-bold uppercase tracking-wider mb-1.5">
+            <ClipboardList class="w-3.5 h-3.5" />
+            <span>Alur Pelayanan 5 Meja Posyandu</span>
+          </div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+            Hari Pelayanan Posyandu Melati Pujer
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-xl">
+            1. Pendaftaran Balita → 2. Timbang & Ukur (BB & TB) → 3. Hitung Z-Score WHO → 4. Diagnosis Pakar Certainty Factor → 5. Verifikasi Bidan.
+          </p>
+        </div>
+        <div class="flex items-center gap-2.5 flex-shrink-0">
+          <Link
+            :href="route('kader.balita.create')"
+            class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-orbit-surface border border-slate-200 dark:border-orbit-border hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 shadow-2xs transition-all"
+          >
+            + Balita Baru
+          </Link>
+          <Link
+            :href="route('kader.kunjungan.create')"
+            class="px-4 py-2 text-xs font-semibold rounded-xl bg-orbit-primary hover:bg-orbit-primary/90 text-white shadow-md shadow-purple-600/25 transition-all flex items-center gap-1.5"
+          >
+            <span>Mulai Penimbangan</span>
+            <ArrowRight class="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </div>
     </div>
 
@@ -160,6 +194,7 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3'
+import { Plus, ClipboardList, ArrowRight } from 'lucide-vue-next'
 import KaderLayout from '@/Layouts/KaderLayout.vue'
 import StatCard from '@/Components/StatCard.vue'
 import StatusBadge from '@/Components/StatusBadge.vue'

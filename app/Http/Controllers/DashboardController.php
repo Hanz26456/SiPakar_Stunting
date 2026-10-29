@@ -160,7 +160,7 @@ class DashboardController extends Controller
 
         $diagnosisTerbaru = $balita->diagnosisTerbaru;
 
-        return Inertia::render('Ortu/DetilAnak', [
+        return Inertia::render('Ortu/DetailAnak', [
             'balita' => [
                 'id'            => $balita->id,
                 'nama'          => $balita->nama,
@@ -192,6 +192,50 @@ class DashboardController extends Controller
     public function panduan(): Response
     {
         return Inertia::render('Ortu/Panduan');
+    }
+
+    /**
+     * Navigasi pintas riwayat pertumbuhan anak orang tua.
+     */
+    public function pertumbuhanAnak()
+    {
+        $user = auth()->user();
+        $balita = $user->balita()->first();
+        if ($balita) {
+            return redirect()->route('ortu.anak.show', $balita->id);
+        }
+        return redirect()->route('ortu.dashboard')->with('error', 'Belum ada data balita yang terhubung dengan akun Anda.');
+    }
+
+    /**
+     * Halaman Log Aktivitas Sistem untuk Admin.
+     */
+    public function log(): Response
+    {
+        $aktivitas = \App\Models\Diagnosis::with(['kunjungan.balita', 'kader', 'verifikator'])
+            ->latest()
+            ->paginate(15);
+
+        return Inertia::render('Admin/Log', [
+            'aktivitas' => $aktivitas,
+        ]);
+    }
+
+    /**
+     * Halaman Pengaturan Sistem untuk Admin.
+     */
+    public function pengaturan(): Response
+    {
+        return Inertia::render('Admin/Pengaturan', [
+            'sistem' => [
+                'nama'     => 'SiPakar Stunting',
+                'versi'    => '1.0.0-Orbit',
+                'posyandu' => 'Posyandu Melati Pujer',
+                'lokasi'   => 'Kecamatan Pujer, Kabupaten Bondowoso',
+                'metode'   => 'Certainty Factor (CF) & Standar Antropometri WHO 2006',
+                'pakar'    => 'Bidan Marini Poeji',
+            ],
+        ]);
     }
 
    Public function admin(): Response

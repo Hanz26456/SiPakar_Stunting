@@ -1,188 +1,332 @@
 <template>
   <KaderLayout title="Diagnosis Stunting">
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-5xl mx-auto space-y-6">
 
-      <!-- Info balita + kunjungan -->
-      <div class="grid grid-cols-3 gap-4 mb-5">
-        <div class="col-span-2 bg-white rounded-xl border border-gray-200 p-4">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-lg">👶</div>
+      <!-- Breadcrumbs / Top Navigation -->
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+            <Calculator class="w-3.5 h-3.5" />
+            <span>Sistem Pakar Certainty Factor</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
+            Diagnosis Pertumbuhan & Stunting
+          </h1>
+        </div>
+
+        <Link
+          :href="route('kader.kunjungan.index')"
+          class="px-3.5 py-1.5 text-xs font-medium rounded-xl border border-slate-200 dark:border-orbit-border bg-white dark:bg-orbit-surface text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+        >
+          Kembali
+        </Link>
+      </div>
+
+      <!-- Balita Info + Real-time CF Meter Header -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Balita & Anthropometry Card -->
+        <div class="lg:col-span-2 bg-white dark:bg-orbit-surface border border-slate-200 dark:border-orbit-border rounded-2xl p-5 shadow-2xs">
+          <div class="flex items-center gap-3.5 mb-4 pb-4 border-b border-slate-100 dark:border-orbit-border/80">
+            <div class="w-11 h-11 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0">
+              <Baby class="w-6 h-6" />
+            </div>
             <div>
-              <div class="font-medium text-gray-800">{{ balita.nama }}</div>
-              <div class="text-sm text-gray-400">{{ balita.usia_format }} · {{ balita.jenis_kelamin }}</div>
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">
+                {{ balita.nama }}
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                {{ balita.usia_format }} · {{ balita.jenis_kelamin }} · Ibu: {{ balita.nama_ibu }}
+              </p>
             </div>
           </div>
-          <div class="grid grid-cols-4 gap-3">
-            <div class="text-center p-2 bg-gray-50 rounded-lg">
-              <div class="text-lg font-semibold text-gray-800">{{ kunjungan.berat_badan }}</div>
-              <div class="text-xs text-gray-400">BB (kg)</div>
+
+          <!-- Measurements Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3 bg-slate-50 dark:bg-orbit-surface2/60 rounded-xl text-center border border-slate-100 dark:border-orbit-border/60">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">Berat Badan</span>
+              <span class="text-lg font-bold text-slate-900 dark:text-white">{{ kunjungan.berat_badan }}</span>
+              <span class="text-[11px] text-slate-400 ml-0.5">kg</span>
             </div>
-            <div class="text-center p-2 bg-gray-50 rounded-lg">
-              <div class="text-lg font-semibold text-gray-800">{{ kunjungan.tinggi_badan }}</div>
-              <div class="text-xs text-gray-400">TB (cm)</div>
+
+            <div class="p-3 bg-slate-50 dark:bg-orbit-surface2/60 rounded-xl text-center border border-slate-100 dark:border-orbit-border/60">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">Tinggi Badan</span>
+              <span class="text-lg font-bold text-slate-900 dark:text-white">{{ kunjungan.tinggi_badan }}</span>
+              <span class="text-[11px] text-slate-400 ml-0.5">cm</span>
             </div>
-            <div class="text-center p-2 bg-gray-50 rounded-lg">
-              <div class="text-lg font-semibold" :class="zscoreColor(kunjungan.zscore_tbu)">
+
+            <div class="p-3 bg-slate-50 dark:bg-orbit-surface2/60 rounded-xl text-center border border-slate-100 dark:border-orbit-border/60">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">Z-Score TB/U</span>
+              <span class="text-lg font-bold" :class="zscoreColor(kunjungan.zscore_tbu)">
                 {{ kunjungan.zscore_tbu?.toFixed(2) ?? '-' }}
-              </div>
-              <div class="text-xs text-gray-400">Z-score TB/U</div>
+              </span>
+              <span class="text-[11px] text-slate-400 ml-0.5">SD</span>
             </div>
-            <div class="text-center p-2 rounded-lg" :class="statusBg(kunjungan.status_zscore)">
-              <div class="text-sm font-semibold" :class="statusText(kunjungan.status_zscore)">
-                {{ kunjungan.status_zscore }}
+
+            <div class="p-3 bg-slate-50 dark:bg-orbit-surface2/60 rounded-xl text-center border border-slate-100 dark:border-orbit-border/60">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">Status Gizi</span>
+              <div class="mt-0.5">
+                <StatusBadge
+                  :status="kunjungan.status_zscore?.toLowerCase().replace(' ', '_') ?? 'normal'"
+                  :label="kunjungan.status_zscore ?? 'Normal'"
+                />
               </div>
-              <div class="text-xs text-gray-400">Status</div>
             </div>
           </div>
         </div>
 
-        <!-- Preview CF real-time -->
-        <div class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col">
-          <div class="text-xs font-medium text-gray-500 mb-2">CF kombinasi</div>
-          <div class="flex-1 flex flex-col items-center justify-center">
-            <div v-if="loading" class="text-gray-300 text-2xl">⏳</div>
-            <div v-else>
-              <div
-                class="text-4xl font-bold mb-1 text-center"
-                :class="cfColor(preview?.cf_kombinasi ?? 0)"
-              >
-                {{ preview?.cf_persen ?? '0%' }}
-              </div>
-              <div class="text-center">
-                <StatusBadge
-                  :status="preview?.status_stunting ?? 'normal'"
-                  :label="preview?.label_status ?? 'Normal'"
-                />
-              </div>
-              <div class="text-xs text-gray-400 text-center mt-2">
-                {{ preview?.gejala_aktif ?? 0 }} / {{ preview?.total_gejala ?? 0 }} gejala aktif
-              </div>
+        <!-- Real-Time CF Output Card -->
+        <div class="bg-white dark:bg-orbit-surface border border-slate-200 dark:border-orbit-border rounded-2xl p-5 shadow-2xs flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Tingkat Keyakinan (CF)
+            </span>
+            <span v-if="loading" class="text-xs text-purple-600 dark:text-purple-400 flex items-center gap-1 font-medium">
+              <Loader2 class="w-3.5 h-3.5 animate-spin" />
+              <span>Menghitung...</span>
+            </span>
+          </div>
+
+          <div class="flex-1 flex flex-col items-center justify-center py-2">
+            <div class="text-4xl sm:text-5xl font-black mb-1.5" :class="cfColor(preview?.cf_kombinasi ?? 0)">
+              {{ preview?.cf_persen ?? '0%' }}
+            </div>
+            <div class="mt-1">
+              <StatusBadge
+                :status="preview?.status_stunting ?? 'normal'"
+                :label="preview?.label_status ?? 'Normal'"
+              />
+            </div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+              {{ preview?.gejala_aktif ?? 0 }} dari {{ preview?.total_gejala ?? 0 }} gejala terkonfirmasi
             </div>
           </div>
-          <!-- CF bar -->
+
+          <!-- Progress Meter -->
           <div class="mt-3">
-            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-2.5 bg-slate-100 dark:bg-orbit-surface2 rounded-full overflow-hidden">
               <div
                 class="h-full rounded-full transition-all duration-500"
                 :class="cfBarColor(preview?.cf_kombinasi ?? 0)"
                 :style="{ width: ((preview?.cf_kombinasi ?? 0) * 100) + '%' }"
-              ></div>
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
-        <!-- Gejala otomatis -->
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm font-medium text-gray-700 mb-1">🤖 Gejala terdeteksi otomatis</div>
-          <div class="text-xs text-gray-400 mb-3">Dari data kunjungan & riwayat balita</div>
-          <div class="space-y-2">
+      <!-- Two-Column Symptoms Section -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Automatic Symptoms from Measurements -->
+        <div class="bg-white dark:bg-orbit-surface border border-slate-200 dark:border-orbit-border rounded-2xl p-5 shadow-2xs">
+          <div class="flex items-center gap-2 mb-1">
+            <Cpu class="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">
+              Gejala Otomatis (Antropometri)
+            </h3>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+            Dihitung otomatis oleh sistem berdasarkan standar baku WHO & riwayat KMS balita.
+          </p>
+
+          <div class="space-y-2.5">
             <div
-              v-for="g in gejalOtomatis" :key="g.id"
-              class="flex items-start gap-3 p-2.5 rounded-lg"
-              :class="g.terdeteksi ? 'bg-red-50 border border-red-100' : 'bg-gray-50'"
+              v-for="g in gejalOtomatis"
+              :key="g.id"
+              class="flex items-start gap-3 p-3 rounded-xl border transition-all"
+              :class="g.terdeteksi
+                ? 'bg-rose-50/70 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200'
+                : 'bg-slate-50/70 dark:bg-orbit-surface2/50 border-slate-200/80 dark:border-orbit-border text-slate-700 dark:text-slate-300'"
             >
               <div class="mt-0.5 flex-shrink-0">
-                <span v-if="g.terdeteksi" class="text-red-500">⚠️</span>
-                <span v-else class="text-green-500">✅</span>
+                <AlertTriangle v-if="g.terdeteksi" class="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <CheckCircle2 v-else class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div class="flex-1 min-w-0">
-                <div class="text-sm text-gray-700">{{ g.nama_gejala }}</div>
-                <div class="text-xs text-gray-400 mt-0.5">{{ g.kode }} · otomatis</div>
+                <div class="text-xs sm:text-sm font-semibold leading-snug">
+                  {{ g.nama_gejala }}
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-2 font-mono">
+                  <span>{{ g.kode }}</span>
+                  <span>·</span>
+                  <span :class="g.terdeteksi ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-emerald-600 dark:text-emerald-400'">
+                    {{ g.terdeteksi ? 'Terpenuhi (Aktif)' : 'Normal' }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Gejala manual -->
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm font-medium text-gray-700 mb-1">👁️ Gejala klinis (centang manual)</div>
-          <div class="text-xs text-gray-400 mb-3">Periksa langsung pada balita</div>
-          <div class="space-y-2">
+        <!-- Manual Symptoms Checklist -->
+        <div class="bg-white dark:bg-orbit-surface border border-slate-200 dark:border-orbit-border rounded-2xl p-5 shadow-2xs">
+          <div class="flex items-center gap-2 mb-1">
+            <Stethoscope class="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">
+              Gejala Klinis (Observasi Kader)
+            </h3>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+            Centang jika ditemukan tanda klinis atau fisik saat memeriksa balita secara langsung.
+          </p>
+
+          <div class="space-y-2.5">
             <label
-              v-for="g in gejala_manual" :key="g.id"
-              class="flex items-start gap-3 p-2.5 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-              :class="gejalaManu[g.id] ? 'bg-amber-50 border border-amber-100' : ''"
+              v-for="g in gejala_manual"
+              :key="g.id"
+              class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all select-none"
+              :class="gejalaManu[g.id]
+                ? 'bg-amber-50/80 dark:bg-amber-950/25 border-amber-300 dark:border-amber-700/50 shadow-2xs'
+                : 'bg-slate-50/50 dark:bg-orbit-surface2/40 border-slate-200 dark:border-orbit-border hover:bg-slate-50 dark:hover:bg-white/[0.02]'"
             >
               <input
                 type="checkbox"
                 :checked="gejalaManu[g.id]"
                 @change="toggleGejala(g.id)"
-                class="mt-0.5 rounded accent-emerald-600"
+                class="mt-0.5 w-4 h-4 rounded text-purple-600 focus:ring-purple-500/30 border-slate-300 dark:border-orbit-border"
               >
               <div class="flex-1">
-                <div class="text-sm text-gray-700">{{ g.nama_gejala }}</div>
-                <div class="text-xs text-gray-400 mt-0.5">{{ g.kode }} · {{ g.kategori }}</div>
+                <div class="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white leading-snug">
+                  {{ g.nama_gejala }}
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-2 font-mono">
+                  <span>{{ g.kode }}</span>
+                  <span>·</span>
+                  <span class="capitalize">{{ g.kategori }}</span>
+                </div>
               </div>
             </label>
           </div>
         </div>
+      </div>
 
-        <!-- Detail CF per gejala -->
-        <div class="col-span-2 bg-white rounded-xl border border-gray-200 p-4">
-          <div class="text-sm font-medium text-gray-700 mb-3">📊 Detail perhitungan Certainty Factor</div>
-          <div class="space-y-2">
-            <div
-              v-for="d in preview?.detail_gejala ?? []" :key="d.kode_rule"
-              class="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0"
-            >
-              <div class="w-12 text-xs text-gray-400 font-mono">{{ d.kode_rule }}</div>
-              <div class="flex-1 text-sm text-gray-700 min-w-0 truncate">{{ d.nama_gejala }}</div>
-              <div class="flex items-center gap-3 text-xs flex-shrink-0">
-                <span class="text-blue-500 w-16">MB: {{ d.mb }}</span>
-                <span class="text-orange-500 w-16">MD: {{ d.md }}</span>
-                <span class="font-medium w-20" :class="d.gejala_aktif ? 'text-red-500' : 'text-gray-300'">
-                  CF: {{ d.cf_pakar.toFixed(2) }}
-                </span>
-                <span v-if="d.gejala_aktif" class="w-5">✅</span>
-                <span v-else class="w-5 text-gray-200">—</span>
-              </div>
-            </div>
-          </div>
-          <div v-if="preview" class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-            <div class="text-sm font-medium text-gray-700">CF Kombinasi Final</div>
-            <div class="text-lg font-bold" :class="cfColor(preview.cf_kombinasi)">
-              {{ preview.cf_persen }}
-            </div>
-          </div>
+      <!-- Mathematical CF Breakdown Table -->
+      <div class="bg-white dark:bg-orbit-surface border border-slate-200 dark:border-orbit-border rounded-2xl p-5 shadow-2xs">
+        <div class="flex items-center gap-2 mb-3">
+          <Calculator class="w-4 h-4 text-purple-600 dark:text-purple-400" />
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">
+            Detail Perhitungan Matematis Certainty Factor
+          </h3>
         </div>
 
-        <!-- Rekomendasi -->
-        <div v-if="preview?.rekomendasi" class="col-span-2 p-4 rounded-xl border"
-          :class="{
-            'bg-red-50 border-red-200':    preview.status_stunting === 'stunting_berat',
-            'bg-amber-50 border-amber-200': preview.status_stunting === 'stunting',
-            'bg-yellow-50 border-yellow-200': preview.status_stunting === 'berisiko',
-            'bg-green-50 border-green-200': preview.status_stunting === 'normal',
-          }"
-        >
-          <div class="text-sm font-medium mb-1 text-gray-700">💡 Rekomendasi sistem</div>
-          <div class="text-sm text-gray-600">{{ preview.rekomendasi }}</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-slate-100 dark:border-orbit-border/80 text-slate-400 uppercase tracking-wider text-[11px] font-semibold">
+                <th class="py-2.5 px-3">Rule</th>
+                <th class="py-2.5 px-3">Gejala Teridentifikasi</th>
+                <th class="py-2.5 px-3 text-center">MB</th>
+                <th class="py-2.5 px-3 text-center">MD</th>
+                <th class="py-2.5 px-3 text-center">CF Pakar</th>
+                <th class="py-2.5 px-3 text-right">Status Rule</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-orbit-border/50">
+              <tr
+                v-for="d in preview?.detail_gejala ?? []"
+                :key="d.kode_rule"
+                class="hover:bg-slate-50/50 dark:hover:bg-white/[0.01]"
+              >
+                <td class="py-2.5 px-3 font-mono font-semibold text-purple-600 dark:text-purple-400">
+                  {{ d.kode_rule }}
+                </td>
+                <td class="py-2.5 px-3 text-slate-800 dark:text-slate-200 font-medium">
+                  {{ d.nama_gejala }}
+                </td>
+                <td class="py-2.5 px-3 text-center text-blue-600 font-mono">
+                  {{ d.mb }}
+                </td>
+                <td class="py-2.5 px-3 text-center text-amber-600 font-mono">
+                  {{ d.md }}
+                </td>
+                <td class="py-2.5 px-3 text-center font-mono font-semibold" :class="d.gejala_aktif ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'">
+                  {{ d.cf_pakar.toFixed(2) }}
+                </td>
+                <td class="py-2.5 px-3 text-right">
+                  <span
+                    v-if="d.gejala_aktif"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50"
+                  >
+                    <Check class="w-3 h-3" />
+                    <span>Dihitung</span>
+                  </span>
+                  <span v-else class="text-slate-400 text-xs">
+                    Tidak aktif
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div v-if="preview" class="mt-4 pt-3 border-t border-slate-100 dark:border-orbit-border/80 flex items-center justify-between">
+          <div class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+            Total CF Kombinasi Final:
+          </div>
+          <div class="text-lg sm:text-xl font-black" :class="cfColor(preview.cf_kombinasi)">
+            {{ preview.cf_persen }}
+          </div>
         </div>
       </div>
 
-      <!-- Action -->
-      <div class="flex justify-end gap-3 mt-5">
-        <Link :href="route('kader.kunjungan.index')" class="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50">
+      <!-- Actionable System Recommendation Card -->
+      <div
+        v-if="preview?.rekomendasi"
+        class="p-5 rounded-2xl border transition-all"
+        :class="{
+          'bg-rose-50/80 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200': preview.status_stunting === 'stunting_berat',
+          'bg-amber-50/80 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200': preview.status_stunting === 'stunting',
+          'bg-yellow-50/80 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-900/40 text-yellow-900 dark:text-yellow-200': preview.status_stunting === 'berisiko',
+          'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-200': preview.status_stunting === 'normal',
+        }"
+      >
+        <div class="flex items-center gap-2 mb-1.5 font-bold text-sm">
+          <Lightbulb class="w-4 h-4" />
+          <span>Rekomendasi Tindakan Klinis:</span>
+        </div>
+        <p class="text-xs sm:text-sm leading-relaxed opacity-95">
+          {{ preview.rekomendasi }}
+        </p>
+      </div>
+
+      <!-- Bottom Action Bar -->
+      <div class="flex items-center justify-between pt-2">
+        <Link
+          :href="route('kader.kunjungan.index')"
+          class="px-4 py-2.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-200 dark:border-orbit-border bg-white dark:bg-orbit-surface text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+        >
           Batalkan
         </Link>
+
         <button
           @click="simpanDiagnosis"
           :disabled="simpanLoading"
-          class="px-5 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 font-medium"
+          class="inline-flex items-center gap-2 px-6 py-2.5 bg-orbit-primary hover:bg-orbit-primary/90 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-md shadow-purple-600/25 transition-all active:scale-[0.98] disabled:opacity-50"
         >
-          {{ simpanLoading ? 'Menyimpan...' : 'Simpan Diagnosis ✓' }}
+          <Loader2 v-if="simpanLoading" class="w-4 h-4 animate-spin" />
+          <Check v-else class="w-4 h-4" />
+          <span>{{ simpanLoading ? 'Menyimpan Hasil...' : 'Simpan & Kirim ke Bidan' }}</span>
         </button>
       </div>
+
     </div>
   </KaderLayout>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import axios from 'axios'
+import {
+  Baby,
+  Calculator,
+  Cpu,
+  Stethoscope,
+  AlertTriangle,
+  CheckCircle2,
+  Check,
+  Lightbulb,
+  Loader2,
+} from 'lucide-vue-next'
 import KaderLayout from '@/Layouts/KaderLayout.vue'
 import StatusBadge from '@/Components/StatusBadge.vue'
 
@@ -230,32 +374,26 @@ const simpanDiagnosis = () => {
   })
 }
 
-// Load preview awal
+// Initial preview load
 fetchPreview()
 
-// Helpers warna
+// Helpers
 const zscoreColor = (z) => {
-  if (z == null) return 'text-gray-400'
-  if (z < -2) return 'text-red-600'
-  if (z < -1) return 'text-amber-600'
-  return 'text-green-600'
+  if (z == null) return 'text-slate-400'
+  if (z < -2) return 'text-rose-600 dark:text-rose-400 font-bold'
+  if (z < -1) return 'text-amber-600 dark:text-amber-400 font-semibold'
+  return 'text-emerald-600 dark:text-emerald-400'
 }
+
 const cfColor = (cf) => {
-  if (cf >= 0.7) return 'text-red-600'
-  if (cf >= 0.4) return 'text-amber-600'
-  return 'text-green-600'
+  if (cf >= 0.7) return 'text-rose-600 dark:text-rose-400'
+  if (cf >= 0.4) return 'text-amber-600 dark:text-amber-400'
+  return 'text-emerald-600 dark:text-emerald-400'
 }
+
 const cfBarColor = (cf) => {
-  if (cf >= 0.7) return 'bg-red-400'
-  if (cf >= 0.4) return 'bg-amber-400'
-  return 'bg-emerald-400'
+  if (cf >= 0.7) return 'bg-rose-500'
+  if (cf >= 0.4) return 'bg-amber-500'
+  return 'bg-emerald-500'
 }
-const statusBg = (s) => ({
-  'Stunting berat': 'bg-red-100', 'Stunting': 'bg-red-50',
-  'Berisiko': 'bg-amber-50', 'Normal': 'bg-green-50'
-}[s] ?? 'bg-gray-50')
-const statusText = (s) => ({
-  'Stunting berat': 'text-red-800', 'Stunting': 'text-red-600',
-  'Berisiko': 'text-amber-600', 'Normal': 'text-green-600'
-}[s] ?? 'text-gray-600')
 </script>

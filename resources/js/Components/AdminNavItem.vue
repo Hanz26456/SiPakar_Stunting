@@ -3,17 +3,18 @@
     :href="href"
     :title="!open ? label : undefined"
     :class="[
-      'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative',
+      'flex items-center gap-3 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-150 group relative',
       active
-        ? 'bg-orbit-primary/15 text-orbit-primary-light font-semibold shadow-sm'
-        : 'text-slate-400 hover:text-slate-100 hover:bg-white/5'
+        ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold'
+        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60'
     ]"
   >
-    <div 
-      v-if="active" 
-      class="absolute left-0 top-2 bottom-2 w-1 bg-orbit-primary rounded-r-full shadow-sm shadow-purple-500/50" 
+    <!-- Metis 2px Left Blue Accent Rail -->
+    <div
+      v-if="active"
+      class="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-blue-600 rounded-r"
     />
-    <span :class="['flex-shrink-0 transition-colors', active ? 'text-orbit-primary-light' : 'text-slate-400 group-hover:text-slate-200']">
+    <span :class="['flex-shrink-0 transition-colors', active ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300']">
       <slot name="icon">
         <span v-if="icon" class="text-base flex-shrink-0 w-5 text-center">{{ icon }}</span>
       </slot>
